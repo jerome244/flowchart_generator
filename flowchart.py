@@ -3,7 +3,7 @@ import sys
 # Limit the maximum width before wrapping to a new "column"
 MAX_LINE_WIDTH = 100  # Adjust this to your preferred limit
 
-# Define colors for different nesting depths (only for the arrows)
+# Define colors for different nesting depths (extend this list as needed)
 NESTING_COLORS = {
     0: '\033[94m',  # Blue
     1: '\033[92m',  # Green
@@ -11,11 +11,20 @@ NESTING_COLORS = {
     3: '\033[91m',  # Red
     4: '\033[95m',  # Magenta
     5: '\033[96m',  # Cyan
+    6: '\033[33m',  # Orange
+    7: '\033[36m',  # Teal
+    8: '\033[37m',  # Gray
+    9: '\033[41m',  # Background Red
+    10: '\033[42m', # Background Green
+    11: '\033[43m', # Background Yellow
+    12: '\033[44m', # Background Blue
 }
 
 # Function to get the color for the arrows based on nesting depth
 def get_arrow_color_for_depth(depth):
-    return NESTING_COLORS.get(depth, '\033[0m')  # Default to no color if depth exceeds predefined levels
+    # Cycle through the available colors if depth exceeds the predefined levels
+    max_depth = len(NESTING_COLORS)
+    return NESTING_COLORS.get(depth % max_depth, '\033[0m')  # Default to no color if depth exceeds predefined levels
 
 def process_code_line(flowchart, stmt, nesting_depth, line_number, current_width):
     """
