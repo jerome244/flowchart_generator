@@ -67,9 +67,20 @@ gcc flowchart_generator.c -o flowchart_generator
 
 ## 🖼️ Screenshots
 
-| 📄 Input C Code | 📊 Output Flowchart |
-|----------------|---------------------|
-| ![Input](https://github.com/your-username/flowchart-converter/blob/main/screenshots/input_example.png?raw=true) | ![Output in c version](https://github.com/jerome244/flowchart_generator/blob/main/img/c_version.png) |  ![Output in py version](https://github.com/jerome244/flowchart_generator/blob/main/img/python_version.png) |
+<p align="center">
+  <b>📄 Input C Code</b><br>
+  <img src="https://github.com/jerome244/flowchart_generator/blob/main/img/cSnippetExample.png" width="400">
+</p>
+
+<p align="center">
+  <b>🧱 Output - C Version</b><br>
+  <img src="https://github.com/jerome244/flowchart_generator/blob/main/img/c_version.png" width="400">
+</p>
+
+<p align="center">
+  <b>🐍 Output - Python Version</b><br>
+  <img src="https://github.com/jerome244/flowchart_generator/blob/main/img/python_version.png" width="400">
+</p>
 
 ---
 
