@@ -114,7 +114,8 @@ Then, navigate to http://localhost:YOUR_PORT in your browser, where you can uplo
 🌍 More features are on the way!
 
 ---
-📖 How to Use/Read this Flowchart
+
+## 📖 How to Use/Read this Flowchart
 This flowchart is designed to visually represent the control flow and structure of your C program. Here's how to read it:
 
 1. Main Flow
