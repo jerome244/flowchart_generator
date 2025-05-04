@@ -2,7 +2,7 @@
   <img src="https://github.com/jerome244/flowchart_generator/blob/main/screenshots/banner.png?raw=true" alt="Flowchart Converter Banner">
 </p>
 
-# 🧠 Flowchart Converter
+# 🧠 Code Reading/ Diagram Understand Helper
 
 > Turn your C code into structured, visual flowcharts.  
 > Perfect for students, developers, and anyone looking to understand program logic at a glance.
@@ -17,6 +17,7 @@
 - [🖼️ Screenshots](#-screenshots)
 - [📁 Project Structure](#-project-structure)
 - [🌐 Web Version](#-web-version)
+- [📖 How to Use/Read this Flowchart](#how-to-use-read-this-flowchart)
 - [👨‍💻 Author](#-author)
 - [📄 License](#-license)
 
@@ -24,8 +25,8 @@
 
 ## 📝 Introduction
 
-**Flowchart Converter** is a simple tool that takes a C source file and transforms its logic into a clear, structured flowchart using Unicode box drawing.  
-It visually separates conditional and looping branches, and highlights nesting levels with indentation and color coding.
+**Code Reading/ Diagram Understand Helper** is a simple tool that takes a C source file and transforms its logic into a clear, structured code using Unicode box drawing.  
+It visually separates conditional and looping branches, and highlights nesting levels with indentation and color coding for an easier and fast understanding.
 
 ---
 
@@ -111,6 +112,47 @@ python3 flowchart_server.py
 Then, navigate to http://localhost:YOUR_PORT in your browser, where you can upload your C code, generate the flowchart, and enjoy the interactive features!
 
 🌍 More features are on the way!
+
+---
+📖 How to Use/Read this Flowchart
+This flowchart is designed to visually represent the control flow and structure of your C program. Here's how to read it:
+
+1. Main Flow
+The main flow of the program runs from top to bottom.
+
+Each function or statement is shown as a box (e.g., a function call or variable assignment).
+
+The main flow proceeds in a straight line unless a control flow structure (like an if or loop) alters it.
+
+2. Control Statements
+Conditionals (if, else, switch):
+
+These are shown as blocks branching to the right of the main flow, indicating where decisions are made in the code.
+
+For example, an if statement will have two branches: one for the condition being true, and another for it being false.
+
+Loops (for, while, do-while):
+
+Loops are represented by boxes that loop back to previous parts of the flow, indicating repetition.
+
+For example, a for loop will show a box that cycles back to the loop’s condition check.
+
+3. Indentation and Nesting
+The flowchart uses indentation (tabs/spaces) to represent nesting levels, showing how deep the control flow is.
+
+The more deeply indented a block is, the more nested it is within other structures (like a loop or if statement).
+
+4. Colors
+The flowchart uses different colors to indicate nesting depth, helping visualize how deep you are in the program’s logic.
+
+Light colors: Shallow nesting.
+
+Darker colors: Deeper nesting.
+
+5. Input and Output
+Boxes with labels like input() or output() represent where the program takes inputs (e.g., user input) or produces outputs (e.g., printing to the console).
+
+By following the structure of the flowchart, you can easily trace how the program flows, see the control structures, and understand the overall logic of the code.
 
 ---
 
