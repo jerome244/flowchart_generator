@@ -108,7 +108,7 @@ You’ll soon be able to paste or upload your C code directly into a browser and
 ## 👨‍💻 Author
 
 **Your Name**  
-🔗 GitHub: [@your-username](https://github.com/your-username)
+🔗 GitHub: [@jerome244](https://github.com/jerome244)
 
 ---
 
