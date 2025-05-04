@@ -3,7 +3,7 @@ import socketserver
 import cgi
 from flowchart_generator import generate_flowchart_from_c_code  # Corrected import
 
-PORT = 8082  # Set a fixed port number
+PORT = 8081  # Set a fixed port number
 
 class FlowchartHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
@@ -17,7 +17,7 @@ class FlowchartHandler(http.server.SimpleHTTPRequestHandler):
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Flowchart Generator</title>
+                    <title>Code Reading/Diagram Understand Helper</title> <!-- Updated title -->
                     <style>
                         body {
                             font-family: 'Arial', sans-serif;
@@ -131,7 +131,7 @@ class FlowchartHandler(http.server.SimpleHTTPRequestHandler):
                         <a href="#about" id="about-link">About</a>
                         <a href="#help" id="help-link">Help</a>
                     </div>
-                    <h1>Flowchart Generator</h1>
+                    <h1>Code Reading/Diagram Understand Helper</h1> <!-- Updated title -->
                     <form enctype="multipart/form-data" method="post" action="/upload">
                         <label for="file" style="font-size: 1.2rem;">Upload Your C Code File</label>
                         <input type="file" name="file" accept=".c" id="file" required><br>
@@ -153,7 +153,6 @@ class FlowchartHandler(http.server.SimpleHTTPRequestHandler):
                 </body>
                 </html>
             ''')
-
         else:
             self.send_error(404, 'Page Not Found')
 
@@ -304,9 +303,9 @@ class FlowchartHandler(http.server.SimpleHTTPRequestHandler):
             else:
                 self.send_error(400, "No file uploaded.")
         else:
-            self.send_error(404, 'Invalid endpoint')
+            self.send_error(404, 'Page Not Found')
 
-if __name__ == '__main__':
-    with socketserver.TCPServer(('', PORT), FlowchartHandler) as httpd:
-        print(f"Starting server on port {PORT}...")
-        httpd.serve_forever()
+with socketserver.TCPServer(("", PORT), FlowchartHandler) as httpd:
+    print(f"Serving on port {PORT}")
+    httpd.serve_forever()
+
