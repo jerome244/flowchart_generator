@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/your-username/flowchart-converter/blob/main/screenshots/banner.png?raw=true" alt="Flowchart Converter Banner">
+  <img src="https://github.com/jerome244/flowchart_generator/blob/main/screenshots/banner.png?raw=true" alt="Flowchart Converter Banner">
 </p>
 
 # 🧠 Flowchart Converter
