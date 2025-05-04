@@ -1,17 +1,111 @@
-Welcome to my own made flowchart converter program
+<p align="center">
+  <img src="https://github.com/your-username/flowchart-converter/blob/main/screenshots/banner.png?raw=true" alt="Flowchart Converter Banner">
+</p>
 
-This program convert a given c code into a flowchart.
+# 🧠 Flowchart Converter
 
-For executing this program, you need a c code file.
+> Turn your C code into structured, visual flowcharts.  
+> Perfect for students, developers, and anyone looking to understand program logic at a glance.
 
-For launching it you can type in your bash command-line:
+---
 
-            python3 flowchart_generator.py yourCfile.c
+## 📌 Table of Contents
 
-or:
-            gcc flowchart_generator.c -o flowchart_generator
+- [📝 Introduction](#-introduction)
+- [⚙️ Features](#️-features)
+- [💻 Usage](#-usage)
+- [🖼️ Screenshots](#-screenshots)
+- [📁 Project Structure](#-project-structure)
+- [🌐 Web Version](#-web-version)
+- [👨‍💻 Author](#-author)
+- [📄 License](#-license)
 
-and:
-            ./flowchart_generator yourCfile.c
+---
 
-I am also actually working on a web version :D
+## 📝 Introduction
+
+**Flowchart Converter** is a simple tool that takes a C source file and transforms its logic into a clear, structured flowchart using Unicode box drawing.  
+It visually separates conditional and looping branches, and highlights nesting levels with indentation and color coding.
+
+---
+
+## ⚙️ Features
+
+- ✅ Supports conditionals (`if`, `else`, `switch`) and loops (`while`, `for`, `do-while`)
+- ✅ Braces (`{}`) are optional — works with one-liners
+- ✅ Indented, color-coded flowcharts using Unicode
+- ✅ Runs via Python script or compiled C binary
+- ✅ Control flow branches are visually offset to the right
+- 🌐 Web version in progress!
+
+---
+
+## 💻 Usage
+
+### 🔧 Requirements
+
+- Python 3 installed  
+_OR_  
+- GCC for C version
+
+### ▶️ Run the Python version
+
+```bash
+python3 flowchart_generator.py yourCfile.c
+```
+
+### ⚙️ Compile and run the C version
+
+```bash
+gcc flowchart_generator.c -o flowchart_generator
+./flowchart_generator yourCfile.c
+```
+
+> Replace `yourCfile.c` with your own C source file.
+
+---
+
+## 🖼️ Screenshots
+
+| 📄 Input C Code | 📊 Output Flowchart |
+|----------------|---------------------|
+| ![Input](https://github.com/your-username/flowchart-converter/blob/main/screenshots/input_example.png?raw=true) | ![Output](https://github.com/your-username/flowchart-converter/blob/main/screenshots/flowchart_output.png?raw=true) |
+
+---
+
+## 📁 Project Structure
+
+| File/Folder | Description |
+|-------------|-------------|
+| `flowchart_generator.py` | Python version of the flowchart generator |
+| `flowchart_generator.c` | C version of the flowchart generator |
+| `screenshots/` | Contains images used in this README |
+| `README.md` | Project documentation |
+| `LICENSE` | License file (MIT recommended) |
+
+---
+
+## 🌐 Web Version
+
+The **Web Flowchart Generator** is under development!  
+You’ll soon be able to paste or upload your C code directly into a browser and see the flowchart instantly.
+
+> 🌍 Stay tuned for a live demo!
+
+---
+
+## 👨‍💻 Author
+
+**Your Name**  
+🔗 GitHub: [@your-username](https://github.com/your-username)
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**.  
+You are free to use, modify, and distribute it.
+
+---
+
+
