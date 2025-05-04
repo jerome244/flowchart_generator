@@ -1,52 +1,44 @@
 import sys
 import re
 
-# Limit the maximum width before wrapping to a new "column"
-MAX_LINE_WIDTH = 100  # Adjust this to your preferred limit
+MAX_LINE_WIDTH = 100
 
-# Define colors for different nesting depths (extend this list as needed)
-NESTING_COLORS = {
-    0: '\033[94m',  # Blue
-    1: '\033[92m',  # Green
-    2: '\033[93m',  # Yellow
-    3: '\033[91m',  # Red
-    4: '\033[95m',  # Magenta (Pink)
-    5: '\033[96m',  # Cyan
-    6: '\033[33m',  # Orange
-    7: '\033[36m',  # Teal
-    8: '\033[37m',  # Gray
-    9: '\033[41m',  # Background Red
-    10: '\033[42m', # Background Green
-    11: '\033[43m', # Background Yellow
-    12: '\033[44m', # Background Blue
-    'default': '\033[97m',  # White for default
+HTML_NESTING_COLORS = {
+    0: '#1E90FF',  # Bright Dodger Blue
+    1: '#32CD32',  # Bright Lime Green
+    2: '#FFD700',  # Bright Gold
+    3: '#FF4500',  # Bright Orange Red
+    4: '#8A2BE2',  # Bright Blue Violet
+    5: '#00CED1',  # Dark Turquoise
+    6: '#FFA500',  # Bright Orange
+    7: '#20B2AA',  # Light Sea Green
+    8: '#D3D3D3',  # Light Gray
+    9: '#A9A9A9',  # Dark Gray
+    'default': '#FFFFFF',  # Default White
+    'comment': '#D3D3D3'  # Light Gray for comments
 }
 
-def get_arrow_color_for_depth(depth):
-    max_depth = len(NESTING_COLORS)
-    return NESTING_COLORS.get(depth % max_depth, '\033[0m')
-
-def process_code_line(flowchart, stmt, nesting_depth, current_width, color, include_line_number=True):
-    shift = " " * (nesting_depth * 10)
-    stmt_length = len(stmt) + 12  # Account for padding inside the box
+def process_code_line(flowchart, stmt, depth, current_width, is_comment=False):
+    color = HTML_NESTING_COLORS['comment'] if is_comment else HTML_NESTING_COLORS.get(depth, HTML_NESTING_COLORS['default'])
+    shift = "&nbsp;" * (depth * 4)
+    stmt_length = len(stmt) + 6
 
     if current_width + stmt_length > MAX_LINE_WIDTH:
-        flowchart.append("")
+        flowchart.append("<br>")
         current_width = 0
 
-    flowchart.append(f"{shift}{color}+{'-' * stmt_length}+{'\033[0m'}")
-    flowchart.append(f"{shift}{color}|  {stmt.ljust(len(stmt) + 8)}   |\033[0m")  # 1 space removed here
-    flowchart.append(f"{shift}{color}+{'-' * stmt_length}+{'\033[0m'}")
+    border = f"{shift}<span style='color:{color}'>+{'-' * stmt_length}+</span><br>"
+    content = f"{shift}<span style='color:{color}'>|  {stmt.ljust(stmt_length - 6)}  |  </span><br>"  # Added 2 spaces after the bar
 
-    current_width += stmt_length
-    return current_width
+    flowchart.extend([border, content, border])
+    return current_width + stmt_length
 
-def process_multiple_statements_on_same_line(flowchart, line, nesting_depth, current_width, color):
+def process_multiple_statements_on_same_line(flowchart, line, depth, current_width):
     statements = line.split(";")
     for stmt in statements:
         stmt = stmt.strip()
         if stmt:
-            current_width = process_code_line(flowchart, stmt, nesting_depth, current_width, color)
+            current_width = process_code_line(flowchart, stmt, depth, current_width)
     return current_width
 
 def generate_flowchart_from_c_code(code: str) -> str:
@@ -87,60 +79,75 @@ def generate_flowchart_from_c_code(code: str) -> str:
             includes.append(line)
         elif re.match(r"\w+\s+\w+\s*\(.*\)\s*;", line) and not re.match(r".*=\s*malloc.*", line):
             functions.append(line)
-        elif re.match(r"(\w+\s+\**\w+\s*=.*|\w+\s+\**\w+)", line):
+        elif re.match(r"(\w+\s+\**\w+\s*=.*|\w+\s+\**\w+)", line) and not re.match(r"^(if|for|while|else|else\s+if|switch)\b", line):
             declarations.append(line)
         else:
             code_lines.append(line)
 
-    # Colorized comments section (Gray), no '|' in comments
+    # Handling Comments (display in light gray)
     if comments:
-        flowchart.append("Comments:")
+        flowchart.append("<b>Comments:</b><br>")
         for comment in comments:
-            current_width = process_code_line(flowchart, comment, nesting_depth, current_width, NESTING_COLORS[8], include_line_number=False)
+            current_width = process_code_line(flowchart, comment, nesting_depth, current_width, is_comment=True)
             line_number += 1
-        flowchart.append("")
+        flowchart.append("<br>")
 
-    # Colorized preprocessor directives (Blue)
+    # Handling Preprocessor Directives
     if includes:
-        flowchart.append("Preprocessor Directives:")
+        flowchart.append("<b>Preprocessor Directives:</b><br>")
         for include in includes:
-            current_width = process_code_line(flowchart, include, nesting_depth, current_width, NESTING_COLORS[0], include_line_number=False)
+            current_width = process_code_line(flowchart, include, nesting_depth, current_width)
             line_number += 1
-        flowchart.append("")
+        flowchart.append("<br>")
 
-    # Variable Declarations Section
+    # Handling Declarations
     if declarations:
-        flowchart.append("Function Declaration:")
-
-        # First declaration: pink, depth 0
-        current_width = process_code_line(flowchart, declarations[0], 0, current_width, NESTING_COLORS[4], include_line_number=False)
-        flowchart.append("")  # Newline after first declaration
-        flowchart.append("Variable Declarations:")
-
-        # Remaining declarations: gray, depth 1
+        flowchart.append("<b>Function Declaration:</b><br>")
+        current_width = process_code_line(flowchart, declarations[0], 0, current_width)
+        flowchart.append("<br><b>Variable Declarations:</b><br>")
         for declaration in declarations[1:]:
-            current_width = process_code_line(flowchart, declaration, 1, current_width, NESTING_COLORS[8], include_line_number=False)
+            current_width = process_code_line(flowchart, declaration, 1, current_width)
             line_number += 1
-        flowchart.append("")
+        flowchart.append("<br>")
 
-    # Function declarations (Blue)
+    # Handling Function Declarations
     if functions:
-        flowchart.append("Function Declarations:")
+        flowchart.append("<b>Function Declarations:</b><br>")
         for func in functions:
-            current_width = process_code_line(flowchart, func, 0, current_width, NESTING_COLORS[0])
+            current_width = process_code_line(flowchart, func, 0, current_width)
             line_number += 1
-        flowchart.append("")
+        flowchart.append("<br>")
 
-    flowchart.append("Function Logic Starts:")
-
-    nesting_depth = 1  # Start logic at depth 1
+    flowchart.append("<b>Function Logic Starts:</b><br>")
+    nesting_depth = 1
 
     i = 0
     while i < len(code_lines):
         line = code_lines[i].strip()
 
-        if re.match(r"^(if|for|while|else if|else)\b", line):
-            current_width = process_code_line(flowchart, line, nesting_depth, current_width, NESTING_COLORS.get(nesting_depth, '\033[0m'))
+        # Handling switch statement
+        if re.match(r"^switch\b", line):
+            current_width = process_code_line(flowchart, line, nesting_depth, current_width)
+            brace_stack.append("{")
+            nesting_depth += 1
+            i += 1
+            continue
+        
+        # Handling case statements within a switch
+        elif re.match(r"^case\b", line):
+            current_width = process_code_line(flowchart, line, nesting_depth + 1, current_width)
+            i += 1
+            continue
+
+        # Handling default case within a switch
+        elif re.match(r"^default\b", line):
+            current_width = process_code_line(flowchart, line, nesting_depth + 1, current_width)
+            i += 1
+            continue
+
+        # Handling other conditionals (if, for, while, else, etc.)
+        elif re.match(r"^(if|for|while|else if|else)\b", line):
+            current_width = process_code_line(flowchart, line, nesting_depth, current_width)
             next_line = code_lines[i + 1].strip() if i + 1 < len(code_lines) else ""
             if next_line == "{":
                 brace_stack.append("{")
@@ -152,8 +159,11 @@ def generate_flowchart_from_c_code(code: str) -> str:
             i += 1
             continue
 
+        # Continue processing other logic as per the previous code...
+        # Skipping the logic for if/else/while since it's already in your current code
+
         if increment_next:
-            current_width = process_code_line(flowchart, code_lines[i].strip(), nesting_depth + 1, current_width, NESTING_COLORS.get(nesting_depth + 1, '\033[0m'))
+            current_width = process_code_line(flowchart, code_lines[i].strip(), nesting_depth + 1, current_width)
             increment_next = False
             i += 1
             continue
@@ -168,10 +178,10 @@ def generate_flowchart_from_c_code(code: str) -> str:
             i += 1
             continue
 
-        current_width = process_multiple_statements_on_same_line(flowchart, line, nesting_depth, current_width, NESTING_COLORS.get(nesting_depth, '\033[0m'))
+        current_width = process_multiple_statements_on_same_line(flowchart, line, nesting_depth, current_width)
         i += 1
 
-    return "\n".join(flowchart)
+    return "<pre style='font-family: monospace'>" + "".join(flowchart) + "</pre>"
 
 def main():
     if len(sys.argv) != 2:

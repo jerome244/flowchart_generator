@@ -6,7 +6,7 @@
 
 > Turn your C code into structured, visual flowcharts.  
 > Perfect for students, developers, and anyone looking to understand program logic at a glance.
-
+> More of a diagram/flowchart helper-maker and understanding tool, designed to help visualize C code logic in a clear, structured way.
 ---
 
 ## 📌 Table of Contents
@@ -82,6 +82,9 @@ gcc flowchart_generator.c -o flowchart_generator
   <img src="https://github.com/jerome244/flowchart_generator/blob/main/screenshots/python_version.png" width="400">
 </p>
 
+<p align="center"> <b>🌐 Web Preview - 1</b><br> <img src="https://github.com/jerome244/flowchart_generator/blob/main/screenshots/homepage.png?raw=true" width="400"> </p> 
+
+<p align="center"> <b>🌐 Web Preview - 2</b><br> <img src="https://github.com/jerome244/flowchart_generator/blob/main/screenshots/generation.png?raw=true" width="400"> </p>
 ---
 
 ## 📁 Project Structure
@@ -98,10 +101,16 @@ gcc flowchart_generator.c -o flowchart_generator
 
 ## 🌐 Web Version
 
-The **Web Flowchart Generator** is under development!  
-You’ll soon be able to paste or upload your C code directly into a browser and see the flowchart instantly.
+The Web Flowchart Generator is now live!
 
-> 🌍 Stay tuned for a live demo!
+To use the web version, simply run the following command in your terminal:
+
+bash
+Copy code
+python3 flowchart_server.py
+Then, navigate to http://localhost:YOUR_PORT in your browser, where you can upload your C code, generate the flowchart, and enjoy the interactive features!
+
+🌍 More features are on the way!
 
 ---
 
