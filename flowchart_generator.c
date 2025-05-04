@@ -123,7 +123,7 @@ void process_code(const char *filename) {
             in_headed_comments = 1;
             continue;
         } else if (in_headed_comments && !is_comment(start)) {
-            print_box(stdout, headed_comment_block, 0, 0);
+            print_box(stdout, headed_comment_block, 0, 1); // Force grey for comments
             headed_comments_done = 1;
             in_headed_comments = 0;
         }
@@ -131,15 +131,17 @@ void process_code(const char *filename) {
         // Function header
         if (!headed_comments_done && is_function_declaration(start)) {
             if (strlen(headed_comment_block) > 0) {
-                print_box(stdout, headed_comment_block, 0, 0);
+                print_box(stdout, headed_comment_block, 0, 1); // Force grey for comments before function
             }
             headed_comments_done = 1;
             is_start_of_function = 1;
+            print_box(stdout, start, depth, 0); // Function declaration color
+            continue;
         }
 
         // Variable declarations at root
         if (is_start_of_function && is_variable_declaration(start)) {
-            print_box(stdout, start, 0, 0);
+            print_box(stdout, start, depth, 0); // Variable declaration color
             continue;
         }
 
