@@ -1,48 +1,43 @@
-import sys
 import re
+import html  # Import the html module to escape HTML entities
 
 MAX_LINE_WIDTH = 100
 
+# Define colors for different nesting levels (for text and box borders)
 HTML_NESTING_COLORS = {
-    0: '#1E90FF',  # Bright Dodger Blue
-    1: '#32CD32',  # Bright Lime Green
-    2: '#FFD700',  # Bright Gold
-    3: '#FF4500',  # Bright Orange Red
-    4: '#8A2BE2',  # Bright Blue Violet
-    5: '#00CED1',  # Dark Turquoise
-    6: '#FFA500',  # Bright Orange
-    7: '#20B2AA',  # Light Sea Green
-    8: '#D3D3D3',  # Light Gray
-    9: '#A9A9A9',  # Dark Gray
-    'default': '#FFFFFF',  # Default White
-    'comment': '#D3D3D3'  # Light Gray for comments
+    0: '#1E90FF', 1: '#32CD32', 2: '#FFD700', 3: '#FF4500',
+    4: '#8A2BE2', 5: '#00CED1', 6: '#FFA500', 7: '#20B2AA',
+    8: '#D3D3D3', 9: '#A9A9A9', 'default': '#FFFFFF', 'comment': '#A9A9A9'
 }
 
-def process_code_line(flowchart, stmt, depth, current_width, is_comment=False):
-    color = HTML_NESTING_COLORS['comment'] if is_comment else HTML_NESTING_COLORS.get(depth, HTML_NESTING_COLORS['default'])
-    shift = "&nbsp;" * (depth * 4)
-    stmt_length = len(stmt) + 6
+# Dark background for the flowchart boxes (matching website dark theme)
+BOX_BACKGROUND_COLOR = "#1e1e1e"  # Dark gray for the boxes
 
-    if current_width + stmt_length > MAX_LINE_WIDTH:
+def escape_html(text):
+    """Escapes HTML special characters in the input text."""
+    return html.escape(text)
+
+def html_box(flowchart, stmt, depth, current_width, color):
+    stmt = escape_html(stmt)  # Escape any HTML special characters
+    indent = "&nbsp;" * (depth * 4)
+    box_width = len(stmt) + 6
+
+    # Color for the text and border based on nesting depth
+    text_color = color  # Text color based on nesting depth
+    
+    if current_width + box_width > MAX_LINE_WIDTH:
         flowchart.append("<br>")
         current_width = 0
 
-    border = f"{shift}<span style='color:{color}'>+{'-' * stmt_length}+</span><br>"
-    content = f"{shift}<span style='color:{color}'>|  {stmt.ljust(stmt_length - 6)}  |  </span><br>"  # Added 2 spaces after the bar
+    border = f"{indent}<span style='background-color:{BOX_BACKGROUND_COLOR}; color:{text_color};'>+{'-' * box_width}+</span><br>"
+    content = f"{indent}<span style='background-color:{BOX_BACKGROUND_COLOR}; color:{text_color};'>|  {stmt.ljust(box_width - 6)}  |</span><br>"
 
     flowchart.extend([border, content, border])
-    return current_width + stmt_length
+    return current_width + box_width
 
-def process_multiple_statements_on_same_line(flowchart, line, depth, current_width):
-    statements = line.split(";")
-    for stmt in statements:
-        stmt = stmt.strip()
-        if stmt:
-            current_width = process_code_line(flowchart, stmt, depth, current_width)
-    return current_width
-
+# -------------------- C CODE PARSER --------------------
 def generate_flowchart_from_c_code(code: str) -> str:
-    lines = code.strip().split('\n')
+    lines = code.strip().splitlines()
     flowchart = []
     nesting_depth = 0
     inside_comment = False
@@ -55,17 +50,12 @@ def generate_flowchart_from_c_code(code: str) -> str:
     functions = []
     declarations = []
     code_lines = []
-
-    line_number = 1
     increment_next = False
 
     for line in lines:
         line = line.strip()
-
         if not line:
-            line_number += 1
             continue
-
         if line.startswith("/*"):
             inside_comment = True
             comment_block.append(line)
@@ -75,6 +65,8 @@ def generate_flowchart_from_c_code(code: str) -> str:
                 comments.append("\n".join(comment_block))
                 inside_comment = False
                 comment_block = []
+        elif line.startswith("//"):
+            comments.append(line)
         elif line.startswith("#include"):
             includes.append(line)
         elif re.match(r"\w+\s+\w+\s*\(.*\)\s*;", line) and not re.match(r".*=\s*malloc.*", line):
@@ -84,70 +76,57 @@ def generate_flowchart_from_c_code(code: str) -> str:
         else:
             code_lines.append(line)
 
-    # Handling Comments (display in light gray)
+    # Header comments
     if comments:
         flowchart.append("<b>Comments:</b><br>")
         for comment in comments:
-            current_width = process_code_line(flowchart, comment, nesting_depth, current_width, is_comment=True)
-            line_number += 1
+            current_width = html_box(flowchart, comment, nesting_depth, current_width, HTML_NESTING_COLORS['comment'])
         flowchart.append("<br>")
 
-    # Handling Preprocessor Directives
+    # Preprocessor
     if includes:
         flowchart.append("<b>Preprocessor Directives:</b><br>")
         for include in includes:
-            current_width = process_code_line(flowchart, include, nesting_depth, current_width)
-            line_number += 1
+            current_width = html_box(flowchart, include, nesting_depth, current_width, HTML_NESTING_COLORS.get(nesting_depth))
         flowchart.append("<br>")
 
-    # Handling Declarations
+    # Declarations
     if declarations:
         flowchart.append("<b>Function Declaration:</b><br>")
-        current_width = process_code_line(flowchart, declarations[0], 0, current_width)
+        current_width = html_box(flowchart, declarations[0], 0, current_width, HTML_NESTING_COLORS.get(0))
         flowchart.append("<br><b>Variable Declarations:</b><br>")
         for declaration in declarations[1:]:
-            current_width = process_code_line(flowchart, declaration, 1, current_width)
-            line_number += 1
+            current_width = html_box(flowchart, declaration, 1, current_width, HTML_NESTING_COLORS.get(1))
         flowchart.append("<br>")
 
-    # Handling Function Declarations
+    # Functions
     if functions:
         flowchart.append("<b>Function Declarations:</b><br>")
         for func in functions:
-            current_width = process_code_line(flowchart, func, 0, current_width)
-            line_number += 1
+            current_width = html_box(flowchart, func, 0, current_width, HTML_NESTING_COLORS.get(0))
         flowchart.append("<br>")
 
+    # Function logic
     flowchart.append("<b>Function Logic Starts:</b><br>")
     nesting_depth = 1
-
     i = 0
     while i < len(code_lines):
         line = code_lines[i].strip()
 
-        # Handling switch statement
         if re.match(r"^switch\b", line):
-            current_width = process_code_line(flowchart, line, nesting_depth, current_width)
+            current_width = html_box(flowchart, line, nesting_depth, current_width, HTML_NESTING_COLORS.get(nesting_depth))
             brace_stack.append("{")
             nesting_depth += 1
             i += 1
             continue
-        
-        # Handling case statements within a switch
-        elif re.match(r"^case\b", line):
-            current_width = process_code_line(flowchart, line, nesting_depth + 1, current_width)
+
+        elif re.match(r"^case\b", line) or re.match(r"^default\b", line):
+            current_width = html_box(flowchart, line, nesting_depth + 1, current_width, HTML_NESTING_COLORS.get(nesting_depth + 1))
             i += 1
             continue
 
-        # Handling default case within a switch
-        elif re.match(r"^default\b", line):
-            current_width = process_code_line(flowchart, line, nesting_depth + 1, current_width)
-            i += 1
-            continue
-
-        # Handling other conditionals (if, for, while, else, etc.)
         elif re.match(r"^(if|for|while|else if|else)\b", line):
-            current_width = process_code_line(flowchart, line, nesting_depth, current_width)
+            current_width = html_box(flowchart, line, nesting_depth, current_width, HTML_NESTING_COLORS.get(nesting_depth))
             next_line = code_lines[i + 1].strip() if i + 1 < len(code_lines) else ""
             if next_line == "{":
                 brace_stack.append("{")
@@ -159,11 +138,8 @@ def generate_flowchart_from_c_code(code: str) -> str:
             i += 1
             continue
 
-        # Continue processing other logic as per the previous code...
-        # Skipping the logic for if/else/while since it's already in your current code
-
         if increment_next:
-            current_width = process_code_line(flowchart, code_lines[i].strip(), nesting_depth + 1, current_width)
+            current_width = html_box(flowchart, code_lines[i].strip(), nesting_depth + 1, current_width, HTML_NESTING_COLORS.get(nesting_depth + 1))
             increment_next = False
             i += 1
             continue
@@ -178,30 +154,58 @@ def generate_flowchart_from_c_code(code: str) -> str:
             i += 1
             continue
 
-        current_width = process_multiple_statements_on_same_line(flowchart, line, nesting_depth, current_width)
+        # Regular statement
+        current_width = html_box(flowchart, line, nesting_depth, current_width, HTML_NESTING_COLORS.get(nesting_depth))
         i += 1
 
     return "<pre style='font-family: monospace'>" + "".join(flowchart) + "</pre>"
 
-def main():
-    if len(sys.argv) != 2:
-        print("Usage: python flowchart_generator.py <C file path>")
-        sys.exit(1)
+# -------------------- PYTHON CODE PARSER --------------------
+def get_indent_level(line: str) -> int:
+    return len(line) - len(line.lstrip(' '))
 
-    file_path = sys.argv[1]
+def generate_flowchart_from_python(code: str) -> str:
+    lines = code.strip().splitlines()
+    flowchart = []
+    indent_stack = [0]
+    depth = 0
+    current_width = 0
+    inside_multiline_comment = False
+    last_was_control = False
 
-    try:
-        with open(file_path, 'r') as file:
-            code = file.read()
-            flowchart = generate_flowchart_from_c_code(code)
-            print(flowchart)
-    except FileNotFoundError:
-        print(f"Error: The file '{file_path}' was not found.")
-        sys.exit(1)
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        sys.exit(1)
+    for raw_line in lines:
+        line = raw_line.rstrip()
+        if not line.strip():
+            continue
 
-if __name__ == "__main__":
-    main()
+        stripped = line.strip()
+        indent = get_indent_level(raw_line)
+
+        if inside_multiline_comment:
+            current_width = html_box(flowchart, stripped, depth, current_width, HTML_NESTING_COLORS['comment'])
+            if '"""' in stripped or "'''" in stripped:
+                inside_multiline_comment = False
+            continue
+
+        if stripped.startswith(("'''", '"""')):
+            inside_multiline_comment = not inside_multiline_comment
+            current_width = html_box(flowchart, stripped, depth, current_width, HTML_NESTING_COLORS['comment'])
+            continue
+
+        if stripped.startswith("#"):
+            current_width = html_box(flowchart, stripped, depth, current_width, HTML_NESTING_COLORS['comment'])
+            continue
+
+        while indent < indent_stack[-1]:
+            indent_stack.pop()
+            depth -= 1
+
+        if indent > indent_stack[-1]:
+            indent_stack.append(indent)
+            depth += 1
+
+        color = HTML_NESTING_COLORS.get(depth, HTML_NESTING_COLORS['default'])
+        current_width = html_box(flowchart, stripped, depth, current_width, color)
+
+    return "<pre style='font-family: monospace'>" + "".join(flowchart) + "</pre>"
 
