@@ -21,8 +21,8 @@ The application requires **Python 3** and the following libraries:
 These are included in most Python installations, but you can install Tkinter manually if missing:
 
 ### On Linux:
-```bash
 sudo apt install python3-tk
+
 ### On Windows/macOS:
 Tkinter is generally bundled with the standard Python installation. If you're missing it, install the latest version from python.org.
 
